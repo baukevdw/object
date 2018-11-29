@@ -43,8 +43,8 @@ trait ReferenceFactory
         $remoteProperties = $policy->properties($remote);
 
         return new RemoteKey(
-            $localProperties[reset($localKey)],
-            $remoteProperties[$foreignKey],
+            $localProperties->byColumnName(reset($localKey)),
+            $remoteProperties->byColumnName($foreignKey),
             $foreignKey,
             $this->repository($remote)
         );
@@ -79,8 +79,8 @@ trait ReferenceFactory
         $remoteProperties = $policy->properties($remote);
 
         return new LocalKey(
-            $localProperties[$localForeignKey],
-            $remoteProperties[reset($remoteKey)],
+            $localProperties->byColumnName($localForeignKey),
+            $remoteProperties->byColumnName(reset($remoteKey)),
             reset($remoteKey),
             $this->repository($remote)
         );
@@ -112,8 +112,8 @@ trait ReferenceFactory
         $remoteForeignKey = $policy->foreignKey($remote);
 
         return new JunctionTable(
-            $localProperties[reset($localKey)],
-            $remoteProperties[reset($remoteKey)],
+            $localProperties->byColumnName(reset($localKey)),
+            $remoteProperties->byColumnName(reset($remoteKey)),
             reset($remoteKey),
             $this->repository($remote),
             $this->connection(),

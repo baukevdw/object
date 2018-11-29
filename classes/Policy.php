@@ -88,22 +88,18 @@ class Policy
      * Get properties for class
      *
      * @param string $class
-     * @return Property[]
+     * @return Properties
+     * @throws \ReflectionException
      */
     public function properties(string $class)
     {
-        $properties = [];
-        /** @noinspection PhpUnhandledExceptionInspection */
-        foreach ((new ReflectionClass($class))->getProperties() as $reflection) {
+        $properties = array_filter(array_map(function (\ReflectionProperty $reflection) {
             $property = new Property($reflection);
-            if ($this->skip($property)) {
-                continue;
-            }
 
-            $properties[$this->column($property->name())] = $property;
-        }
+            return $this->skip($property) ? null : $property;
+        }, (new ReflectionClass($class))->getProperties()));
 
-        return $properties;
+        return new Properties($this, ...$properties);
     }
 
     /**

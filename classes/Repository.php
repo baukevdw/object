@@ -29,9 +29,9 @@ class Repository
     private $key;
 
     /**
-     * @var Property[]
+     * @var Properties
      */
-    private $properties;
+    protected $properties;
 
     /**
      * @var string|null
@@ -45,10 +45,15 @@ class Repository
      * @param string     $class
      * @param string     $table
      * @param string[]   $key
-     * @param Property[] $properties
+     * @param Properties $properties
      */
-    public function __construct(Connection $connection, string $class, string $table, array $key, array $properties)
-    {
+    public function __construct(
+        Connection $connection,
+        string $class,
+        string $table,
+        array $key,
+        Properties $properties
+    ) {
         $this->connection = $connection;
         $this->class      = $class;
         $this->table      = $table;
@@ -199,7 +204,8 @@ class Repository
         } else {
             $id = $this->insert($data);
             if ($id && count($this->key) === 1) {
-                $this->properties[reset($this->key)]->set($entity, $id);
+                $property = $this->properties->byColumnName(reset($this->key));
+                $property->set($entity, $id);
             }
         }
         if (method_exists($entity, 'relations')) {
@@ -264,7 +270,7 @@ class Repository
         $identifier = $this->identifier($entity);
 
         if ($this->softDelete) {
-            $this->properties[$this->softDelete]->set($entity, "now");
+            $this->properties->byColumnName($this->softDelete)->set($entity, "now");
             $this->store($entity);
             return 1;
         } else {
@@ -282,8 +288,12 @@ class Repository
     public function toArray($entity): array
     {
         $data = [];
-        foreach ($this->properties as $key => $property) {
-            $data[$key] = $property->get($entity);
+        /**
+         * @var string   $column
+         * @var Property $property
+         */
+        foreach ($this->properties as $column => $property) {
+            $data[$column] = $property->get($entity);
         }
 
         return $data;
@@ -298,6 +308,10 @@ class Repository
      */
     public function fromArray($entity, array $data)
     {
+        /**
+         * @var string   $column
+         * @var Property $property
+         */
         foreach ($this->properties as $key => $property) {
             $property->set($entity, $data[$key] ?? null);
         }
@@ -327,7 +341,7 @@ class Repository
         $keys = array_combine($this->key, $this->key);
 
         return array_map(function (string $key) use ($entity) {
-            return $this->properties[$key]->get($entity);
+            return $this->properties->byColumnName($key)->get($entity);
         }, $keys);
     }
 

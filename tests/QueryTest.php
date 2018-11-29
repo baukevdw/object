@@ -4,6 +4,8 @@ namespace Neat\Object\Test;
 
 use Neat\Database\Connection;
 use Neat\Object\Collection;
+use Neat\Object\Policy;
+use Neat\Object\Properties;
 use Neat\Object\Query;
 use Neat\Object\Repository;
 use Neat\Object\Test\Helper\Factory;
@@ -19,11 +21,17 @@ class QueryTest extends TestCase
     private $connection;
 
     /**
+     * @var Policy
+     */
+    private $policy;
+
+    /**
      * Setup before each test method
      */
     public function setUp()
     {
         $this->connection = (new Factory)->connection();
+        $this->policy = new Policy();
     }
 
     /**
@@ -36,7 +44,7 @@ class QueryTest extends TestCase
     {
         return $this->getMockBuilder(Repository::class)
             ->setMethods($methods)
-            ->setConstructorArgs([$this->connection, User::class, 'user', ['id'], []])
+            ->setConstructorArgs([$this->connection, User::class, 'user', ['id'], new Properties($this->policy)])
             ->getMock();
     }
 
