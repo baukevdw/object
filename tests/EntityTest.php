@@ -275,7 +275,7 @@ class EntityTest extends TestCase
             "update_date"   => date("Y-m-d H:i:s"),
             'register_date' => null,
             'deleted_date'  => null,
-            'id'            => null,
+            'id'            => 1,
         ];
 
         $user = new User();

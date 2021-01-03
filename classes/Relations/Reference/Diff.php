@@ -24,12 +24,6 @@ class Diff
     /** @var array */
     private $delete = [];
 
-    /**
-     * Diff constructor.
-     * @param RepositoryInterface $remoteRepository
-     * @param array               $before
-     * @param array               $after
-     */
     public function __construct(RepositoryInterface $remoteRepository, array $before, array $after)
     {
         $this->remoteRepository = $remoteRepository;
@@ -62,10 +56,7 @@ class Diff
         return array_values($this->delete);
     }
 
-    /**
-     * @return void
-     */
-    protected function diff()
+    protected function diff(): void
     {
         $this->insert = array_filter(
             $this->after,
